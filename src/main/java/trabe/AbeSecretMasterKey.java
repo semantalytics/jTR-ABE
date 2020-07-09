@@ -64,8 +64,9 @@ public class AbeSecretMasterKey {
         Element[] alpha_i = Lw14Util.readElementArray(usersSqrt, stream);
         Element[] r_i = Lw14Util.readElementArray(usersSqrt, stream);
         Element[] c_j = Lw14Util.readElementArray(usersSqrt, stream);
+        Element b = stream.readElement();
 
-        return new AbeSecretMasterKey(pubKey, alpha_i, r_i, c_j, null, counter);
+        return new AbeSecretMasterKey(pubKey, alpha_i, r_i, c_j, b, counter);
     }
 
     public static AbeSecretMasterKey readFromFile(File file) throws IOException {
@@ -108,6 +109,7 @@ public class AbeSecretMasterKey {
         Lw14Util.writeArray(alpha_i, stream, false);
         Lw14Util.writeArray(r_i, stream, false);
         Lw14Util.writeArray(c_j, stream, false);
+        stream.writeElement(b);
     }
     
     public byte[] getAsByteArray() throws IOException {
