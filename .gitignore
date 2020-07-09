@@ -20,3 +20,6 @@ examples/
 testFolder/
 target/
 out/
+
+.idea
+src/gen
