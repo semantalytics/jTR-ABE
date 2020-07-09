@@ -19,13 +19,14 @@ public class LsssMatrix {
      * Encapsulates the AST tree into a much less complicated object.
      */
     private static class TreeNode {
+
         public int[] vector;
         public TreeNode parent;
-        public Node node;
+        public final Node node;
         public TreeNode leftChild;
         public TreeNode rightChild;
 
-        public TreeNode(Node node) {
+        public TreeNode(final Node node) {
             this.node = node;
         }
 
@@ -43,7 +44,7 @@ public class LsssMatrix {
          * @return  Child nodes
          */
         public List<Node> getChildren() {
-            ArrayList<Node> children = new ArrayList<Node>(node.jjtGetNumChildren());
+            final ArrayList<Node> children = new ArrayList<Node>(node.jjtGetNumChildren());
             for(int i = 0; i < node.jjtGetNumChildren(); i++) {
                 children.add(node.jjtGetChild(i));
             }

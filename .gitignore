@@ -23,3 +23,5 @@ out/
 
 .idea
 src/gen
+
+*.log

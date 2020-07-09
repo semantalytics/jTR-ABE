@@ -14,11 +14,12 @@ import trabe.lw14.Lw14;
  * on streams and the streams cannot be read anew.
  */
 public class AbeEncrypted {
+
     private final CipherText cipher;
 	private final byte[] iv;
 	private final InputStream dataStream; // the encrypted data
 
-	AbeEncrypted(byte[] iv, CipherText cipher, InputStream dataStream) {
+	AbeEncrypted(final byte[] iv, final CipherText cipher, final InputStream dataStream) {
 		this.iv = iv;
 		this.cipher = cipher;
 		this.dataStream = dataStream;
@@ -28,8 +29,9 @@ public class AbeEncrypted {
 		return cipher;
 	}
 
-	public void writeEncryptedFile(OutputStream out, AbePublicKey publicKey) throws IOException {
-		AbeOutputStream abeOut = new AbeOutputStream(out, publicKey);
+	public void writeEncryptedFile(final OutputStream out, final AbePublicKey publicKey) throws IOException {
+
+		final AbeOutputStream abeOut = new AbeOutputStream(out, publicKey);
 		cipher.writeToStream(abeOut);
 		abeOut.writeInt(iv.length);
 		abeOut.write(iv);
@@ -40,7 +42,7 @@ public class AbeEncrypted {
 		}
 	}
 
-	public static AbeEncrypted readFromFile(AbePublicKey publicKey, File file) throws IOException {
+	public static AbeEncrypted readFromFile(final AbePublicKey publicKey, final File file) throws IOException {
 		return AbeEncrypted.readFromStream(publicKey, new BufferedInputStream(new FileInputStream(file)));
 	}
 

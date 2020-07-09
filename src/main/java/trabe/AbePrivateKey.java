@@ -3,7 +3,6 @@ package trabe;
 import java.io.*;
 import java.util.*;
 
-import it.unisa.dia.gas.jpbc.ElementPowPreProcessing;
 import it.unisa.dia.gas.jpbc.PairingPreProcessing;
 import trabe.lw14.Lw14PrivateKeyComponent;
 import it.unisa.dia.gas.jpbc.Element;

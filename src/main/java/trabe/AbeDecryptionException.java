@@ -4,11 +4,11 @@ public class AbeDecryptionException extends DecryptionException {
 
 	private static final long serialVersionUID = 2848983353356933397L;
 
-	public AbeDecryptionException(String msg) {
+	public AbeDecryptionException(final String msg) {
 		super(msg);
 	}
 
-	public AbeDecryptionException(String msg, Throwable t) {
+	public AbeDecryptionException(final String msg, final Throwable t) {
 		super(msg, t);
 	}
 }

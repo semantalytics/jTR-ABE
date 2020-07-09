@@ -6,7 +6,7 @@ public class Lw14Polynomial {
     /* coefficients from [0] x^0 to [deg] x^deg */
     public Element[] coef; /* G_T (of length deg+1) */
 
-    private Lw14Polynomial(int deg) {
+    private Lw14Polynomial(final int deg) {
         coef = new Element[deg + 1];
     }
 
@@ -18,16 +18,20 @@ public class Lw14Polynomial {
      * @param zeroVal   Zero element
      * @return Random polynomial
      */
-    public static Lw14Polynomial createRandom(int deg, Element zeroVal) {
-        Lw14Polynomial newPoly = new Lw14Polynomial(deg);
-        for (int i = 0; i < newPoly.coef.length; i++)
+    public static Lw14Polynomial createRandom(final int deg, final Element zeroVal) {
+
+        final Lw14Polynomial newPoly = new Lw14Polynomial(deg);
+
+        for (int i = 0; i < newPoly.coef.length; i++) {
             newPoly.coef[i] = zeroVal.duplicate();
+        }
 
         newPoly.coef[0].set(zeroVal);
 
-        for (int i = 1; i < newPoly.coef.length; i++)
+        for (int i = 1; i < newPoly.coef.length; i++) {
             newPoly.coef[i].setToRandom();
+        }
+
         return newPoly;
     }
-
 }

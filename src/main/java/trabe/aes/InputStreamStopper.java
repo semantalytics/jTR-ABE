@@ -9,6 +9,7 @@ import java.io.InputStream;
  *
  */
 public class InputStreamStopper extends InputStream {
+
 	private static final int EOF = -1;
 	private long maxLength;
 	private long curPos;

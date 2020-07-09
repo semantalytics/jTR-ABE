@@ -17,14 +17,15 @@ import trabe.policy.PolicyParsing;
 import trabe.policyparser.*;
 
 public class Lw14Util {
-    private enum ElementType { G1, G2, GT, Zr}
 
-    private static Element elementFromString(ElementType et, String s, AbePublicKey publicKey) {
+    private enum ElementType { G1, G2, GT, Zr }
+
+    private static Element elementFromString(final ElementType et, String s, final AbePublicKey publicKey) {
         try {
-            MessageDigest hasher = MessageDigest.getInstance(AbeSettings.ELEMENT_HASHING_ALGORITHM);
+            final MessageDigest hasher = MessageDigest.getInstance(AbeSettings.ELEMENT_HASHING_ALGORITHM);
             byte[] digest = hasher.digest(s.getBytes());
-            Field field;
-            switch (et){
+            final Field field;
+            switch (et) {
                 case G1:
                     field = publicKey.getPairing().getG1();
                     break;

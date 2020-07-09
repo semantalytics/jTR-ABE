@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class AbeInputStream extends DataInputStream {
-    private final String       PUB_MISSING_ERROR = "Can't read Elements without the public master key.";
+
+    private static final String PUB_MISSING_ERROR = "Can't read Elements without the public master key.";
 
     private AbePublicKey publicKey;
 
-    public AbeInputStream(InputStream in, AbePublicKey publicKey) {
+    public AbeInputStream(final InputStream in, final AbePublicKey publicKey) {
     	super(in);
     	this.publicKey = publicKey;
     }
@@ -25,15 +26,15 @@ public class AbeInputStream extends DataInputStream {
     	this(in, null);
 	}
 
-	public void setPublicKey(AbePublicKey pubKey) {
+	public void setPublicKey(final AbePublicKey pubKey) {
         this.publicKey = pubKey;
     }
 
     // only used for the curve parameters and attributes, no need for fancy encodings
     // since internal attribute representation only uses [a-zA-Z0-9:_]
     public String readString() throws IOException {
-        int length = readInt();
-        byte[] bytes = new byte[length];
+        final int length = readInt();
+        final byte[] bytes = new byte[length];
         readFully(bytes);
         return new String(bytes, AbeSettings.STRINGS_LOCALE);
     }

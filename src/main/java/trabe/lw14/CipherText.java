@@ -44,13 +44,22 @@ public class CipherText {
 
     public int[] revokedUserIndexes;
 
-    private CipherText(){}
+    private CipherText() { }
 
-    public CipherText(LsssMatrix accessMatrix, ElementVector[] r1, ElementVector[] r2,
-                      Element[] q1, Element[] q2, Element[] q3, Element[] t,
-                      ElementVector[] c1, ElementVector[] c2,
-                      Element[] p1, Element[] p2, Element[] p3,
-                      String policy, int[] revokedUserIndexes) {
+    public CipherText(LsssMatrix accessMatrix,
+                      ElementVector[] r1,
+                      ElementVector[] r2,
+                      Element[] q1,
+                      Element[] q2,
+                      Element[] q3,
+                      Element[] t,
+                      ElementVector[] c1,
+                      ElementVector[] c2,
+                      Element[] p1,
+                      Element[] p2,
+                      Element[] p3,
+                      String policy,
+                      int[] revokedUserIndexes) {
         this.accessMatrix = accessMatrix;
         this.r1 = r1;
         this.r2 = r2;
@@ -67,10 +76,17 @@ public class CipherText {
         this.revokedUserIndexes = revokedUserIndexes;
     }
 
-    public CipherText(Lw14PolicyAbstractNode accessTree, ElementVector[] r1, ElementVector[] r2,
-                      Element[] q1, Element[] q2, Element[] q3, Element[] t,
-                      ElementVector[] c1, ElementVector[] c2,
-                      String policy, int[] revokedUserIndexes) {
+    public CipherText(Lw14PolicyAbstractNode accessTree,
+                      ElementVector[] r1,
+                      ElementVector[] r2,
+                      Element[] q1,
+                      Element[] q2,
+                      Element[] q3,
+                      Element[] t,
+                      ElementVector[] c1,
+                      ElementVector[] c2,
+                      String policy,
+                      int[] revokedUserIndexes) {
         this.accessTree = accessTree;
         this.r1 = r1;
         this.r2 = r2;
@@ -84,10 +100,10 @@ public class CipherText {
         this.revokedUserIndexes = revokedUserIndexes;
     }
 
-    public void writeToStream(AbeOutputStream stream) throws IOException {
+    public void writeToStream(final AbeOutputStream stream) throws IOException {
         stream.writeInt(SERIALIZE_VERSION);
 
-        boolean isAccessStructure = isAccessMatrix();
+        final boolean isAccessStructure = isAccessMatrix();
         stream.writeBoolean(isAccessStructure);
         if (isAccessStructure) {
             accessMatrix.writeToStream(stream);

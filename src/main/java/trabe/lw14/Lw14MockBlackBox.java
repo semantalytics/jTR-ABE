@@ -12,15 +12,15 @@ import java.util.List;
 
 public class Lw14MockBlackBox extends Lw14DecryptionBlackBox {
 
-    public List<AbePrivateKey> userKeys = new ArrayList<AbePrivateKey>();
-    public AbePublicKey publicKey;
+    private final List<AbePrivateKey> userKeys;
+    private final AbePublicKey publicKey;
 
-    public Lw14MockBlackBox(List<AbePrivateKey> userKeys, AbePublicKey publicKey) {
+    public Lw14MockBlackBox(final List<AbePrivateKey> userKeys, final AbePublicKey publicKey) {
         this.userKeys = userKeys;
         this.publicKey = publicKey;
     }
 
-    public Lw14MockBlackBox(AbePrivateKey[] userKeys, AbePublicKey publicKey) {
+    public Lw14MockBlackBox(final AbePrivateKey[] userKeys, final AbePublicKey publicKey) {
         this.userKeys = new ArrayList<AbePrivateKey>(userKeys.length);
         Collections.addAll(this.userKeys, userKeys);
         this.publicKey = publicKey;
@@ -33,8 +33,8 @@ public class Lw14MockBlackBox extends Lw14DecryptionBlackBox {
      * @return is decryptable
      */
     @Override
-    public Element decrypt(CipherText ct) {
-        for(AbePrivateKey key : userKeys) {
+    public Element decrypt(final CipherText ct) {
+        for(final AbePrivateKey key : userKeys) {
             try {
                 if (Lw14.canDecrypt(key, ct)) {
                     return Lw14.decrypt(key, ct);
@@ -43,7 +43,7 @@ public class Lw14MockBlackBox extends Lw14DecryptionBlackBox {
                 System.err.println("Decrypting with key with index " + userKeys.indexOf(key) + " failed");
                 e.printStackTrace();
             } catch (AbeDecryptionException e) {
-
+                e.printStackTrace();
             }
         }
         return null;

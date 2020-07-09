@@ -45,6 +45,7 @@ public class Lw14 {
 
     private static final String ATTRIBUTE_NOT_FOUND     = "an attribute was not found in the source private key";
     private static final String ATTRIBUTES_DONT_SATISFY = "decryption failed: attributes in key do not satisfy policy";
+    private static final int MIN_USERS = 2;
 
     /**
      * Generate a secret master key. The public master key is part of the secret master key.
@@ -52,14 +53,14 @@ public class Lw14 {
      *                 It will be automatically increased to the next power of 2.
      * @return secret master key
      */
-    public static AbeSecretMasterKey setup(int users) {
-        if (users < 2) {
+    public static AbeSecretMasterKey setup(final int users) {
+        if (users < MIN_USERS) {
             throw new IllegalArgumentException("The system must accommodate at least two users.");
         }
-        int usersSqrt = (int)(Math.ceil(Math.sqrt(users+1)));
+        final int usersSqrt = (int)(Math.ceil(Math.sqrt(users + 1)));
 
-        AbePublicKey pub = new AbePublicKey(AbeSettings.curveParams);
-        Pairing p = pub.getPairing();
+        final AbePublicKey pub = new AbePublicKey(AbeSettings.curveParams);
+        final Pairing p = pub.getPairing();
 
         final Element g = p.getG1().newRandomElement();
         final Element h = p.getG1().newRandomElement();
@@ -81,11 +82,13 @@ public class Lw14 {
         final Element b = p.getZr().newRandomElement();
         final Element Gquote = H.duplicate().powZn(b);
 
-        boolean usePreprocessing = AbeSettings.PREPROCESSING && usersSqrt >= AbeSettings.PREPROCESSING_THRESHOLD/3.0;
+        boolean usePreprocessing = AbeSettings.PREPROCESSING && usersSqrt >= AbeSettings.PREPROCESSING_THRESHOLD / 3.0;
 
-        ElementPowPreProcessing eppp_g = null;
+        final ElementPowPreProcessing eppp_g;
         if (usePreprocessing) {
             eppp_g = g.duplicate().getElementPowPreProcessing();
+        } else {
+            eppp_g = null;
         }
         for(int i = 0; i < usersSqrt; i++){
             f_j[i] = p.getG1().newRandomElement();
@@ -108,6 +111,7 @@ public class Lw14 {
         }
 
         pub.setElements(g, h, f, f_j, G, H, E_i, G_i, Z_i, H_j, Gquote);
+
         return new AbeSecretMasterKey(pub, alpha_i, r_i, c_j, b);
     }
 
@@ -116,12 +120,14 @@ public class Lw14 {
      * @param msk    Secret master key
      * @return Secret user element
      */
-    public static Pair<Element, Integer> generateUserSecretComponent(AbeSecretMasterKey msk) {
+    public static Pair<Element, Integer> generateUserSecretComponent(final AbeSecretMasterKey msk) {
         if (msk == null) {
             throw new IllegalArgumentException("No secret master key passed");
         }
         // advance current position of the master key
-        Pair<Element, Integer> p = new Pair<Element, Integer>(msk.getPublicKey().getPairing().getZr().newRandomElement(), msk.counter);
+        final Element element = msk.getPublicKey().getPairing().getZr().newRandomElement();
+        final Integer counter = Integer.valueOf(msk.counter);
+        final Pair<Element, Integer> p = new Pair<Element, Integer>(element, counter);
 
         msk.counter++;
         return p;
@@ -134,13 +140,15 @@ public class Lw14 {
      * @param attributes        Attributes for user
      * @return User private key
      */
-    public static AbePrivateKey keygen(AbeSecretMasterKey msk, Pair<Element, Integer> sigmaAndPosition, String[] attributes) {
-        AbePublicKey pub = msk.getPublicKey();
+    public static AbePrivateKey keygen(final AbeSecretMasterKey msk,
+                                       final Pair<Element, Integer> sigmaAndPosition,
+                                       final String[] attributes) {
+        final AbePublicKey pub = msk.getPublicKey();
 
-        Element sigma = sigmaAndPosition.getFirst();
-        AbeUserIndex position = new AbeUserIndex(msk.getSqrtUsers(), sigmaAndPosition.getSecond());
+        final Element sigma = sigmaAndPosition.getFirst();
+        final AbeUserIndex position = new AbeUserIndex(msk.getSqrtUsers(), sigmaAndPosition.getSecond());
 
-        int m = msk.getSqrtUsers();
+        final int m = msk.getSqrtUsers();
         if (position.counter == msk.getMaxUsers()) {
             // last place is reserved so that tracing works
             return null;
@@ -152,6 +160,7 @@ public class Lw14 {
         Element k2_ij = pub.g.duplicate().powZn(sigma);
         Element k3_ij = pub.Z_i[position.i].duplicate().powZn(sigma);
         Element[] k_ijj = new Element[m];
+
         for(int j = 0; j < m; j++){
             if (j != position.j){
                 k_ijj[j] = pub.f_j[j].duplicate().powZn(sigma);
@@ -176,8 +185,9 @@ public class Lw14 {
      * @param attributes    Attributes for user
      * @return List of private key components (secret attribute keys)
      */
-    private static ArrayList<Lw14PrivateKeyComponent> generateAdditionalAttributes(AbeSecretMasterKey msk,
-                                                                                    Element sigma, String[] attributes) {
+    private static ArrayList<Lw14PrivateKeyComponent> generateAdditionalAttributes(final AbeSecretMasterKey msk,
+                                                                                   final Element sigma,
+                                                                                   final String[] attributes) {
         ArrayList<Lw14PrivateKeyComponent> components = new ArrayList<Lw14PrivateKeyComponent>(attributes.length);
         AbePublicKey pub = msk.getPublicKey();
         Pairing p = pub.getPairing();
@@ -284,15 +294,17 @@ public class Lw14 {
      * @return CipherText and key container object
      * @throws AbeEncryptionException Encryption failed
      */
-    public static Pair<CipherText, Element> encrypt(AbePublicKey pub, String policy,
-                                                    int[] revokedUserIndexes, int userIndex)
-            throws AbeEncryptionException
-    {
-        Pairing p = pub.getPairing();
+    public static Pair<CipherText, Element> encrypt(final AbePublicKey pub,
+                                                    final String policy,
+                                                    final int[] revokedUserIndexes,
+                                                    final int userIndex) throws AbeEncryptionException {
+        final Pairing p = pub.getPairing();
 
-        String parsedPolicy = null;
-        LsssMatrix accessStructure;
+        final String parsedPolicy;
+        final LsssMatrix accessStructure;
+
         if (!AbeSettings.USE_TREE) {
+        	parsedPolicy = null;
             try {
                 if (!AbeSettings.USE_THRESHOLD_MATRIX) {
                     accessStructure = LsssMatrix.createMatrixFromBooleanFormula(policy, pub);
@@ -311,21 +323,22 @@ public class Lw14 {
             }
         }
 
-        boolean usePreprocessingPowG = AbeSettings.PREPROCESSING;
-        boolean usePreprocessingOnAttributeAmount = AbeSettings.PREPROCESSING && !AbeSettings.USE_TREE && accessStructure.getAttributes() >= AbeSettings.PREPROCESSING_THRESHOLD;
+        final boolean usePreprocessingPowG = AbeSettings.PREPROCESSING;
+        final boolean usePreprocessingOnAttributeAmount = AbeSettings.PREPROCESSING && !AbeSettings.USE_TREE && accessStructure.getAttributes() >= AbeSettings.PREPROCESSING_THRESHOLD;
 
-        AbeUserIndex ui = new AbeUserIndex(pub.getSqrtUsers(), userIndex);
+        final AbeUserIndex ui = new AbeUserIndex(pub.getSqrtUsers(), userIndex);
+
         int i_bar = ui.i;
         int j_bar = ui.j;
 
         Arrays.sort(revokedUserIndexes);
-
 
         Element message = p.getGT().newRandomElement();
         Element kappa = p.getZr().newRandomElement();
         Element tau = p.getZr().newRandomElement();
         Element[] s_i = new Element[pub.getSqrtUsers()];
         Element[] t_i = new Element[pub.getSqrtUsers()];
+
         for(int i = 0; i < s_i.length; i++) {
             s_i[i] = p.getZr().newRandomElement();
             t_i[i] = p.getZr().newRandomElement();
@@ -333,6 +346,7 @@ public class Lw14 {
 
         ElementVector v = new ElementVector(3, p.getZr());
         ElementVector[] w_j = new ElementVector[pub.getSqrtUsers()];
+
         for(int i = 0; i < s_i.length; i++) {
             w_j[i] = new ElementVector(3, p.getZr());
         }
@@ -348,9 +362,11 @@ public class Lw14 {
                 ry.duplicate().mul(rx) );
 
         ElementVector[] v_i = new ElementVector[pub.getSqrtUsers()];
+
         for(int i = 0; i <= i_bar; i++) {
             v_i[i] = new ElementVector(3, p.getZr());
         }
+
         for(int i = i_bar + 1; i < pub.getSqrtUsers(); i++) {
             // factors for x1 and x2 to create a vector in span{x1, x2}
             Element c1 = p.getZr().newRandomElement();
@@ -499,7 +515,7 @@ public class Lw14 {
             ct = new CipherText(accessStructure, R1_i, R2_i, Q1_i, Q2_i, Q3_i, T_i,
                     C1_j, C2_j, P1_k, P2_k, P3_k, policy, revokedUserIndexes);
         } else {
-            Lw14PolicyAbstractNode policyTree = null;
+            Lw14PolicyAbstractNode policyTree;
             try {
                 policyTree = Lw14PolicyAbstractNode.parsePolicy(parsedPolicy, pub);
             } catch (ParseException e) {
@@ -534,9 +550,11 @@ public class Lw14 {
      * @return decrypted element which can be used to derive the AES key
      * @throws AbeDecryptionException Decryption failed
      */
-    public static Element decrypt(AbePrivateKey privateKey, CipherText cipher) throws AbeDecryptionException {
-        Lw14PolicyAbstractNode root = null;
-        Set<String> allPrivateKeyAttributes = privateKey.getAttributeSet();
+    public static Element decrypt(final AbePrivateKey privateKey, final CipherText cipher) throws AbeDecryptionException {
+
+        final Lw14PolicyAbstractNode root;
+        final Set<String> allPrivateKeyAttributes = privateKey.getAttributeSet();
+
         try {
             if (cipher.accessTree != null) {
                 root = cipher.accessTree;
@@ -748,7 +766,7 @@ public class Lw14 {
         return M;
     }
     
-    public static boolean canDecrypt(AbePrivateKey prv, CipherText cph) throws ParseException {
+    public static boolean canDecrypt(final AbePrivateKey prv, final CipherText cph) throws ParseException {
         if (cph.accessTree != null) {
             return cph.accessTree.checkSatisfy(prv);
         } else if (cph.policy != null) {
@@ -766,12 +784,12 @@ public class Lw14 {
      * @return  Private key Satisfies policy (has the necessary attributes to decrypt)
      * @throws ParseException Policy couldn't be parsed
      */
-    public static boolean canDecrypt(AbePrivateKey prv, String policy) throws ParseException {
-        String postFixPolicy = PolicyParsing.parsePolicy(policy);
+    public static boolean canDecrypt(final AbePrivateKey prv, final String policy) throws ParseException {
+        final String postFixPolicy = PolicyParsing.parsePolicy(policy);
         return Lw14PolicyAbstractNode.parsePolicy(postFixPolicy, prv.getPublicKey()).checkSatisfy(prv);
     }
 
-    public static Element trace(Lw14DecryptionBlackBox blackBox) {
+    public static Element trace(final Lw14DecryptionBlackBox blackBox) {
         // TODO: implement
         throw new RuntimeException("Not implemented");
     }

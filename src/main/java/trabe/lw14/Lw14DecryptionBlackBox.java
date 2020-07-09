@@ -15,7 +15,7 @@ public abstract class Lw14DecryptionBlackBox {
      * @param ct    Cipher text
      * @return is decryptable
      */
-    public boolean canDecrypt(CipherText ct) {
+    public boolean canDecrypt(final CipherText ct) {
         Element pt = decrypt(ct);
         return pt != null;
     }

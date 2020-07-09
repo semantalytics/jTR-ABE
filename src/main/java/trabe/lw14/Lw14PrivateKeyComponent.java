@@ -22,7 +22,12 @@ public class Lw14PrivateKeyComponent {
 
     private Lw14PrivateKeyComponent(){}
 
-    public Lw14PrivateKeyComponent(String attribute, Element hashedAttributeZr, Element k1_ijx, Element k2_ijx, Element k1Tilde_ijx, Element k2Tilde_ijx) {
+    public Lw14PrivateKeyComponent(final String attribute,
+                                   final Element hashedAttributeZr,
+                                   final Element k1_ijx,
+                                   final Element k2_ijx,
+                                   final Element k1Tilde_ijx,
+                                   final Element k2Tilde_ijx) {
         this.attribute = attribute;
         this.hashedAttributeZr = hashedAttributeZr;
         this.k1_ijx = k1_ijx;
@@ -31,14 +36,14 @@ public class Lw14PrivateKeyComponent {
         this.k2Tilde_ijx = k2Tilde_ijx;
     }
 
-    public void writeToStream(AbeOutputStream stream) throws IOException {
+    public void writeToStream(final AbeOutputStream stream) throws IOException {
         stream.writeString(attribute);
         stream.writeElement(hashedAttributeZr);
         stream.writeElement(k1_ijx);
         stream.writeElement(k2_ijx);
     }
 
-    public static Lw14PrivateKeyComponent readFromStream(AbeInputStream stream, int serializeVersion) throws IOException {
+    public static Lw14PrivateKeyComponent readFromStream(final AbeInputStream stream, final int serializeVersion) throws IOException {
         Lw14PrivateKeyComponent component = new Lw14PrivateKeyComponent();
 
         component.attribute = stream.readString();
@@ -53,7 +58,7 @@ public class Lw14PrivateKeyComponent {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null || !(obj instanceof Lw14PrivateKeyComponent)) {
             return false;
         } else if(this == obj) {
