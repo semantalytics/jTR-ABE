@@ -111,6 +111,8 @@ public class AbePublicKey {
         publicKey.Z_i = Lw14Util.readElementArray(usersSqrt, stream);
         publicKey.H_j = Lw14Util.readElementArray(usersSqrt, stream);
 
+        publicKey.Gquote = stream.readElement();
+
         return publicKey;
     }
 
@@ -136,6 +138,8 @@ public class AbePublicKey {
         Lw14Util.writeArray(G_i, stream, false);
         Lw14Util.writeArray(Z_i, stream, false);
         Lw14Util.writeArray(H_j, stream, false);
+
+        stream.writeElement(Gquote);
     }
 
     public void writeToFile(File file) throws IOException {
