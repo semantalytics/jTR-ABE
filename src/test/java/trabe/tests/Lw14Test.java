@@ -76,6 +76,7 @@ public class Lw14Test {
         AbePrivateKey att1att2Key = Cpabe.keygen(smKey, att1att2Attribute, preKey1);
         AbePrivateKey att1Key = Cpabe.keygen(smKey, att1Attribute, preKey2);
 
+        policy1EncryptedTest1.getCipher().policy = policy1;
         byte[] dec1 = Cpabe.decrypt(att1att2Key, policy1EncryptedTest1);
         assertTrue(Arrays.equals(data, dec1));
         assertFalse(Arrays.equals(data, decrypt(att1att2Key, policy2EncryptedTest1)));
@@ -404,6 +405,8 @@ public class Lw14Test {
                         new int[]{ privateKeyRevoked.position.counter });
                 assertNotNull(enc);
 
+                enc.getCipher().policy = policy.getKey();
+
                 byte[] ciphertextCopy = enc.writeEncryptedData(msk.getPublicKey());
 
                 byte[] plaintext = Cpabe.decrypt(privateKeyNonRevoked1, AbeEncrypted.read(ciphertextCopy, msk.getPublicKey()));
@@ -448,10 +451,12 @@ public class Lw14Test {
         AbePrivateKey priv3 = Cpabe.keygenSingle(msk, att3att2Attribute);
 
         AbeEncrypted encCopy = AbeEncrypted.read(encData, msk.getPublicKey());
+        encCopy.getCipher().policy = policy1;
         byte[] decData = encCopy.writeDecryptedData(priv1);
         assertTrue(Arrays.equals(data, decData));
 
         encCopy = AbeEncrypted.read(encData, msk.getPublicKey());
+        encCopy.getCipher().policy = policy1;
         decData = encCopy.writeDecryptedData(priv2);
         assertTrue(Arrays.equals(data, decData));
 
@@ -498,6 +503,7 @@ public class Lw14Test {
         assertNotNull(privMerge);
         assertEquals(3, privMerge.getComponents().size());
 
+        enc2.getCipher().policy = policy1;
         byte[] dec2Data = enc2.writeDecryptedData(privMerge);
 
         assertTrue(Arrays.equals(data, dec2Data));

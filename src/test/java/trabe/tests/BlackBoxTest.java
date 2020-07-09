@@ -39,6 +39,10 @@ public class BlackBoxTest {
         AbeEncrypted ct2 = Cpabe.encrypt(pubKey, policy1, data);
         AbeEncrypted ct3 = Cpabe.encrypt(pubKey, policy1, data);
 
+        ct1.getCipher().policy = policy1;
+        ct2.getCipher().policy = policy1;
+        ct3.getCipher().policy = policy1;
+
         String att1att2Attribute = "att1 att2";
         String att1Attribute = "att1";
 
