@@ -540,10 +540,11 @@ public class Lw14 {
         try {
             if (cipher.accessTree != null) {
                 root = cipher.accessTree;
-            } else if (cipher.policy != null) {
-                throw new AbeDecryptionException("No policy available in order to check satisfiability");
             } else {
                 root = Lw14Util.getPolicyTree(cipher.policy, privateKey.getPublicKey());
+            }
+            if (cipher.policy == null) {
+                throw new AbeDecryptionException("No policy available in order to check satisfiability");
             }
             if (!cipher.policy.contains("NOT_")) {
                 if (!Lw14Util.satisfies(root, privateKey)) {
